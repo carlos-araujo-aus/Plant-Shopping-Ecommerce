@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import './ProductList.css'
 import CartItem from './CartItem';
 import { addItem } from './CartSlice';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 function ProductList({ onHomeClick }) {
     const [showCart, setShowCart] = useState(false);
     const [showPlants, setShowPlants] = useState(false);
     const [addedToCart, setAddedToCart] = useState({});
+    const cartItems = useSelector(state => state.cart.items);
     const dispatch = useDispatch();
 
     const plantsArray = [
@@ -258,12 +259,18 @@ function ProductList({ onHomeClick }) {
         setShowCart(false);
     };
 
+
     const handleAddToCart = (product) => {
         dispatch(addItem(product));
         setAddedToCart((prevState) => (
             {...prevState, [product.name]: true,}
         ));
+        calculateTotalQuantity();
     };
+
+    const calculateTotalQuantity = () => {
+        return cartItems ? cartItems.reduce((total, item) => total + item.quantity, 0) : 0;
+         };
 
     return (
         <div>
@@ -305,9 +312,9 @@ function ProductList({ onHomeClick }) {
                                     </path>
                                 </svg>
                                 {
-                                    Object.keys(addedToCart).length > 0 && (
+                                    cartItems.length > 0 && (
                                         <span className="cart_quantity_count">
-                                            {Object.keys(addedToCart).length}
+                                            {calculateTotalQuantity()}
                                         </span>
                                     )
                                 }
